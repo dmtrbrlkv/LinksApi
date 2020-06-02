@@ -4,6 +4,13 @@ from urllib.parse import urlparse
 LINKS_KEY = "links"
 SCHEME_DELIMITER = "//"
 
+ERROR_LINKS_LIST_OR_STR = "Links must be list or string"
+ERROR_LINK_STR = "Link must be string"
+ERROR_NO_DATA = "No data"
+ERROR_BAD_DATA_FORMAT = "Not json data format"
+ERROR_NO_KEY = f"'{LINKS_KEY}' key not found"
+ERROR_BAD_RANGE_DATA = "range_data must be list"
+
 
 class RedisLinksConnector:
     def __init__(self, client, name, id_name):
@@ -17,7 +24,7 @@ class RedisLinksConnector:
         pipe = self.client.pipeline(True)
         pipe.zadd(self.name, {id: timestamp})
         for link in links:
-            pipe.lpush(id, link)
+            pipe.rpush(id, link)
         pipe.execute()
 
     def get_by_range(self, min, max):
@@ -32,13 +39,13 @@ class RedisLinksConnector:
 class Links:
     def __init__(self, links):
         if not isinstance(links, (list, str)):
-            raise TypeError("Links must be list or string")
+            raise TypeError(ERROR_LINKS_LIST_OR_STR)
 
         if isinstance(links, str):
             links = [links]
 
         if not all([isinstance(link, str) for link in links]):
-            raise TypeError("Link must be string")
+            raise TypeError(ERROR_LINK_STR)
 
         self.links = links
 
@@ -52,29 +59,13 @@ class Links:
     @classmethod
     def from_json(cls, json):
         if not json:
-            raise ValueError("No data")
+            raise ValueError(ERROR_NO_DATA)
         if not isinstance(json, dict):
-            raise TypeError("Not json data format")
+            raise TypeError(ERROR_BAD_DATA_FORMAT)
         if LINKS_KEY not in json:
-            raise KeyError(f"'{LINKS_KEY}' key not found")
+            raise KeyError(ERROR_NO_KEY)
 
         links = json[LINKS_KEY]
-        return Links(links)
-
-    @classmethod
-    def from_range_data(cls, range_data):
-        if not isinstance(range_data, list):
-            raise TypeError("mapping must be list")
-
-        links = []
-
-        for data in range_data:
-            data = json.loads(data)
-            try:
-                links.extend(data.values())
-            except:
-                continue
-
         return Links(links)
 
     def get_domains(self):
