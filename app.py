@@ -7,8 +7,6 @@ from links import RedisLinksConnector, Links
 from utils import load_config, make_json_response, now_timestamp, get_visited_domains_params, ERROR_INTERNAL, DOMAINS_KEY
 
 app = Flask(__name__)
-client = None
-redis_connector = None
 
 
 @app.route("/visited_links",methods=["POST"])
