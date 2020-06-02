@@ -2,7 +2,7 @@
 
 Web-приложение на Flask для простого учета посещенных ссылок. Информация сохраняется в Redis. Получение и выдача данных по HTTP в JSON
 
-Установка
+## Установка
 
 `git clone https://github.com/dmtrbrlkv/LinksApi`
 
@@ -17,7 +17,7 @@ source venv/bin/activate
 
 `pip install -r requirements.txt`
 
-Запуск 
+## Запуск 
 
 `python app.py`
 
@@ -30,5 +30,5 @@ source venv/bin/activate
   --password PASSWORD
 ```
 
-Запуск тестов
+## Запуск тестов
 `python -m pytest`
